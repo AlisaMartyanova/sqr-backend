@@ -33,8 +33,8 @@ class EventsModel(db.Model):
 
     def save_to_db(self):
         db.session.add(self)
-        db.session.commit()
-        return self.id
+        # db.session.commit()
+        # return self.id
 
     @classmethod
     def find_by_id(cls, id):
@@ -49,8 +49,8 @@ class EventsModel(db.Model):
     @classmethod
     def update_members_assigned(cls, id, state):
         db.session.query(cls).filter(id=id).update({'members_assigned': state})
-        db.session.commit()
-        return {'message': 'Event members assigned state was successfully edited'}
+        # db.session.commit()
+        # return {'message': 'Event members assigned state was successfully edited'}
 
 
 class EventMembersModel(db.Model):
@@ -65,8 +65,8 @@ class EventMembersModel(db.Model):
 
     def save_to_db(self):
         db.session.add(self)
-        db.session.commit()
-        return self.id
+        # db.session.commit()
+        # return self.id
 
     @classmethod
     def find_by_user(cls, user_id):
@@ -87,8 +87,8 @@ class EventMembersModel(db.Model):
     def update_assignee(cls, user_id, event_id, assignee):
         event = cls.query.filter_by(user_id=user_id, event_id=event_id).first()
         event.asignee = assignee
-        db.session.commit()
-        return {'message': 'Event assignee was successfully edited'}
+        # db.session.commit()
+        # return {'message': 'Event assignee was successfully edited'}
 
     @classmethod
     def update_wishlist(cls, user_id, event_id, wish):
