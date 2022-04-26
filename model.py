@@ -1,7 +1,10 @@
+import datetime
+from typing import Optional, Iterable, List
+
 from app import db
 
 
-class UserModel(db.Model):
+class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -12,15 +15,33 @@ class UserModel(db.Model):
         db.session.commit()
 
     @classmethod
-    def find_by_email(cls, email):
+    def find_by_email(cls, email) -> 'User':
         return cls.query.filter_by(email=email).first()
+
+    @classmethod
+    def ensure_all_users_exist(cls, emails: Iterable[str]) -> List['User']:
+        # INSERT ON CONFLICT DO NOTHING BUT SQLITE CANT DO IT =(
+        users = []
+        for email in set(emails):
+            users.append(cls.get_or_create(email))
+        return users
+
+    @classmethod
+    def get_or_create(cls, email) -> 'User':
+        user: Optional[User] = cls.query.filter_by(email=email).first()
+        if user is None:
+            user = User(email=email)
+            db.session.add(user)
+            db.session.commit()
+        return user
+
 
     @classmethod
     def find_by_id(cls, id):
         return cls.query.filter_by(id=id).first()
 
 
-class EventsModel(db.Model):
+class Event(db.Model):
     __tablename__ = 'events'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -35,6 +56,28 @@ class EventsModel(db.Model):
         db.session.add(self)
         # db.session.commit()
         # return self.id
+
+    @classmethod
+    def create_with_memberships(cls, creator_id, name, gift_date, location: datetime.datetime, members: List[User]) -> 'Event':
+        new_event = Event(
+            members=len(members),
+            creator=creator_id,
+            name=name,
+            gift_date=gift_date,
+            location=location,
+            members_assigned=False
+        )
+        db.session.add(new_event)
+        db.session.commit()  # fetch ID
+        for member in members:
+            new_event_mem = Membership(
+                user_id=member.id,
+                event_id=new_event.id,
+                status="pending"
+            )
+            db.session.add(new_event_mem)
+        db.session.commit()
+        return new_event
 
     @classmethod
     def find_by_id(cls, id):
@@ -53,7 +96,7 @@ class EventsModel(db.Model):
         # return {'message': 'Event members assigned state was successfully edited'}
 
 
-class EventMembersModel(db.Model):
+class Membership(db.Model):
     __tablename__ = 'event_members'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -69,7 +112,7 @@ class EventMembersModel(db.Model):
         # return self.id
 
     @classmethod
-    def find_by_user(cls, user_id):
+    def find_by_user(cls, user_id) -> Iterable['Event']:
         return cls.query.filter_by(user_id=user_id).all()
 
     @classmethod

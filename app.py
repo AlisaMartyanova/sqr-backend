@@ -1,3 +1,5 @@
+
+
 from os import environ
 from flask import Flask
 from flask_cors import CORS
@@ -5,6 +7,7 @@ from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
+app.config['BUNDLE_ERRORS'] = True
 CORS(app)
 
 # configure database postgres
@@ -33,7 +36,6 @@ api = Api(app)
 
 # map urls with functions
 api.add_resource(resources.Event, '/events')
-api.add_resource(resources.UserLogin, '/login')
 api.add_resource(resources.Invitation, '/invitation')
 api.add_resource(resources.Wishlist, '/wishlist')
 api.add_resource(resources.AssignGiftees, '/assignee')
