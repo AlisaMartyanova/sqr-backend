@@ -29,11 +29,11 @@ jobs:
           
       - name: Export database info
         run: |
-          heroku config:set USER=${{secrets.DB_USER}}
-          heroku config:set PASSWORD=${{secrets.DB_PASSWORD}}
-          heroku config:set HOST=${{secrets.DB_HOST}}
-          heroku config:set DB_PORT=${{secrets.DB_PORT}}
-          heroku config:set DB_NAME=${{secrets.DB_NAME}}
+          heroku config:set USER=${{secrets.DB_USER}} -a ${{secrets.HEROKU_APP_NAME}}
+          heroku config:set PASSWORD=${{secrets.DB_PASSWORD}} -a ${{secrets.HEROKU_APP_NAME}}
+          heroku config:set HOST=${{secrets.DB_HOST}} -a ${{secrets.HEROKU_APP_NAME}}
+          heroku config:set DB_PORT=${{secrets.DB_PORT}} -a ${{secrets.HEROKU_APP_NAME}}
+          heroku config:set DB_NAME=${{secrets.DB_NAME}} -a ${{secrets.HEROKU_APP_NAME}}
 
       - name: Push to heroku
         uses: akhileshns/heroku-deploy@v3.12.12
