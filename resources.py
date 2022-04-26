@@ -10,7 +10,7 @@ from app import db
 import _sqlite3
 import sqlalchemy
 
-cred = credentials.Certificate("db/serviceAccountKey.json")
+cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
 
 token_parser = reqparse.RequestParser()
