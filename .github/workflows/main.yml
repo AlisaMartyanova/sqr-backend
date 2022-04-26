@@ -19,15 +19,31 @@ jobs:
         run: |
           gpg --quiet --batch --yes --decrypt --passphrase="${{ secrets.GPG_KEY }}" --output serviceAccountKey.json serviceAccountKey.json.gpg
 
-      - name: Deploy to heroku
+      - name: Login to heroku
+        uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: ''
+          heroku_email: ${{secrets.HEROKU_EMAIL}}
+          justlogin: true
+          
+      - name: Export database info
+        run: |
+          heroku config:set USER=${{secrets.DB_USER}}
+          heroku config:set PASSWORD=${{secrets.DB_PASSWORD}}
+          heroku config:set HOST=${{secrets.DB_HOST}}
+          heroku config:set DB_PORT=${{secrets.DB_PORT}}
+          heroku config:set DB_NAME=${{secrets.DB_NAME}}
+
+      - name: Push to heroku
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
           heroku_email: ${{secrets.HEROKU_EMAIL}}
-        env:
-          USER: ${{secrets.DB_USER}}
-          PASSWORD: ${{secrets.DB_PASSWORD}}
-          HOST: ${{secrets.DB_HOST}}
-          DB_PORT: ${{secrets.DB_PORT}}
-          DB_NAME: ${{secrets.DB_NAME}}
+          
+          
+          
+         
+         
+          
