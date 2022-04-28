@@ -65,7 +65,13 @@ class Event(Resource):
         event_name = event['name']
         event_date = event['gift_date']
         event_location = event['location']
-        event_members = event['members']
+        event_members = set(event['members'])
+
+        if len(event_members) < 1:
+            raise abort(400, message="At least 1 member of event is required")
+
+        if len(event_members) > 10:
+            raise abort(400, message="Maximum 10 members allowed")
 
         members = model.User.ensure_all_users_exist(event_members)
         new_event = model.Event.create_with_memberships(

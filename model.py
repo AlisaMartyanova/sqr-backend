@@ -1,6 +1,8 @@
 import datetime
 from typing import Optional, Iterable, List
 
+from flask_restful import abort
+
 from app import db
 
 
@@ -15,15 +17,21 @@ class User(db.Model):
         db.session.commit()
 
     @classmethod
-    def find_by_email(cls, email) -> 'User':
+    def find_by_email(cls, email) -> Optional['User']:
         return cls.query.filter_by(email=email).first()
 
     @classmethod
     def ensure_all_users_exist(cls, emails: Iterable[str]) -> List['User']:
-        # INSERT ON CONFLICT DO NOTHING BUT SQLITE CANT DO IT =(
         users = []
+        failed_users = []
         for email in set(emails):
-            users.append(cls.get_or_create(email))
+            # SELECT ... WHERE email IN [...]; but I am lazy
+            user = cls.find_by_email(email)
+            if not user:
+                failed_users.append(email)
+        if len(failed_users) > 0:
+            failed_users_str = "Cannot find users with emails: " + (", ".join(failed_users))
+            raise abort(400, message=failed_users_str)
         return users
 
     @classmethod
