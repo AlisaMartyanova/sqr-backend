@@ -26,6 +26,7 @@ jobs:
           export DB_PORT_TEST=${{secrets.DB_PORT_TEST}}
           export DB_NAME_TEST=${{secrets.DB_NAME_TEST}}
           pip install -r requirements.txt
+          pip install pytest
           pytest
 
   build:
