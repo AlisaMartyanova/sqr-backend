@@ -32,7 +32,7 @@ assignee_parser = reqparse.RequestParser()
 assignee_parser.add_argument('event_id', help='This field cannot be blank', required=True, location='args')
 
 
-def authenticate_user(token: str) -> model.User:
+def authenticate_user(token: str):
     try:
         decoded_token = auth.verify_id_token(token)
         uid = decoded_token['uid']

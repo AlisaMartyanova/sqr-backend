@@ -12,10 +12,6 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.String(256), unique=True, nullable=False)
 
-    def save_to_db(self):
-        db.session.add(self)
-        db.session.commit()
-
     @classmethod
     def find_by_email(cls, email) -> Optional['User']:
         return cls.query.filter_by(email=email).first()
@@ -60,13 +56,9 @@ class Event(db.Model):
     location = db.Column(db.String(256))
     members_assigned = db.Column(db.Boolean)
 
-    def save_to_db(self):
-        db.session.add(self)
-        # db.session.commit()
-        # return self.id
-
     @classmethod
-    def create_with_memberships(cls, creator_id, name, gift_date, location: datetime.datetime, members: List[User]) -> 'Event':
+    # def create_with_memberships(cls, creator_id, name, gift_date, location: datetime.datetime, members: List[User]) -> 'Event':
+    def create_with_memberships(cls, creator_id, name, gift_date, location, members):
         new_event = Event(
             members=len(members),
             creator=creator_id,
@@ -92,12 +84,6 @@ class Event(db.Model):
         return cls.query.filter_by(id=id).first()
 
     @classmethod
-    def update_members(cls, id, num):
-        db.session.query(cls).filter(id=id).update({'members': (cls.members + num)})
-        db.session.commit()
-        return {'message': 'Event members was successfully edited'}
-
-    @classmethod
     def update_members_assigned(cls, id, state):
         db.session.query(cls).filter(id=id).update({'members_assigned': state})
         # db.session.commit()
@@ -114,13 +100,8 @@ class Membership(db.Model):
     asignee = db.Column(db.Integer, db.ForeignKey("users.id")) 
     wishlist = db.Column(db.Text)
 
-    def save_to_db(self):
-        db.session.add(self)
-        # db.session.commit()
-        # return self.id
-
     @classmethod
-    def find_by_user(cls, user_id) -> Iterable['Event']:
+    def find_by_user(cls, user_id):
         return cls.query.filter_by(user_id=user_id).all()
 
     @classmethod

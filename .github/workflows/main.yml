@@ -8,7 +8,28 @@ on:
   workflow_dispatch:
 
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+
+      - name: Decrypt GPG file
+        run: |
+          gpg --quiet --batch --yes --decrypt --passphrase="${{ secrets.GPG_KEY }}" --output serviceAccountKey.json serviceAccountKey.json.gpg
+
+      - name: Test
+        run: |
+          export USER_TEST=${{secrets.DB_USER_TEST}}
+          export PASSWORD_TEST=${{secrets.DB_PASSWORD_TEST}}
+          export HOST_TEST=${{secrets.DB_HOST_TEST}}
+          export DB_PORT_TEST=${{secrets.DB_PORT_TEST}}
+          export DB_NAME_TEST=${{secrets.DB_NAME_TEST}}
+          pip install -r requirements.txt
+          pytest
+
   build:
+    needs: test
     runs-on: ubuntu-latest
 
     steps:
@@ -41,9 +62,3 @@ jobs:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
           heroku_app_name: ${{secrets.HEROKU_APP_NAME}}
           heroku_email: ${{secrets.HEROKU_EMAIL}}
-          
-          
-          
-         
-         
-          
