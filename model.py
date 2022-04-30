@@ -25,6 +25,8 @@ class User(db.Model):
             user = cls.find_by_email(email)
             if not user:
                 failed_users.append(email)
+            else:
+                users.append(user)
         if len(failed_users) > 0:
             failed_users_str = "Cannot find users with emails: " + (", ".join(failed_users))
             raise abort(400, message=failed_users_str)

@@ -1,30 +1,37 @@
-from os import environ
 import model
-from app import db, app
+from test import conftest
 
 
-def config():
-    USER = environ.get('USER_TEST')
-    PASSWORD = environ.get('PASSWORD_TEST')
-    HOST = environ.get('HOST_TEST')
-    DB_PORT = environ.get('DB_PORT_TEST')
-    DB_NAME = environ.get('DB_NAME_TEST')
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://{}:{}@{}:{}/{}'.format(USER, PASSWORD, HOST, DB_PORT, DB_NAME)
+class Test:
 
+    def test_save_users(self):
+        emails = ['1234@sdf.com', '1234@sdf.com', 'sdfghj@sdf.com']
+        unique = set(emails)
+        for e in emails:
+            model.User.get_or_create(e)
 
-def save_users(emails):
-    unique = set(emails)
-    for e in emails:
-        model.User.get_or_create(e)
-    users = len(model.User.query.filter_by().all())
-    model.User.query.filter_by().delete()
-    db.session.commit()
-    assert len(unique) == users
+        assert len(unique) == len(model.User.query.filter_by().all())
+        conftest.pytest_unconfigure()
 
+    def test_find_by_email(self):
+        user_email = "asdfgh@sdfg.com"
+        user = model.User.get_or_create(user_email)
+        user_found = model.User.find_by_email(user_email)
 
-def test_save_users():
-    config()
-    users = ['1234@sdf.com', '1234@sdf.com', 'sdfghj@sdf.com']
-    save_users(users)
+        assert user.id == user_found.id
+        assert user.email == user_found.email
+        conftest.pytest_unconfigure()
 
+    def test_find_by_id(self):
+        user_email = "asdfgh@sdfg.com"
+        user = model.User.get_or_create(user_email)
+        user_found = model.User.find_by_id(user.id)
+
+        assert user.id == user_found.id
+        assert user.email == user_found.email
+        conftest.pytest_unconfigure()
+
+    # def test_ensure_all_users_exist(self):
+    #     existed = ['1234@sdf.com', '1234@sdf.com', 'sdfghj@sdf.com']
+    #     check = ['1234@sdf.com', 'sdfghj@sdf.com']
 
