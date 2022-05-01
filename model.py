@@ -87,7 +87,9 @@ class Event(db.Model):
 
     @classmethod
     def update_members_assigned(cls, id, state):
-        db.session.query(cls).filter(id=id).update({'members_assigned': state})
+        # db.session.query(cls).filter().update({'members_assigned': state})
+        event = cls.query.filter_by(id=id).first()
+        event.members_assigned = state
         # db.session.commit()
         # return {'message': 'Event members assigned state was successfully edited'}
 
