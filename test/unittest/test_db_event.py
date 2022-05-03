@@ -1,5 +1,5 @@
 from datetime import datetime
-from test import conftest
+from test.unittest import conftest
 import model
 from app import db
 

@@ -58,10 +58,9 @@ class Event(Resource):
     def post(self):
 
         token = token_parser.parse_args()['token']
-        event = event_parser.parse_args()
-
         user = authenticate_user(token)
 
+        event = event_parser.parse_args()
         event_name = event['name']
         event_date = event['gift_date']
         event_location = event['location']
@@ -86,7 +85,6 @@ class Event(Resource):
     def get(self):
         token = token_parser.parse_args()['token']
         user = authenticate_user(token)
-
         cur_user_events = []
         try:
             memberships = model.Membership.find_by_user(user.id)

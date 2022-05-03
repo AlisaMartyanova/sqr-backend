@@ -25,9 +25,13 @@ jobs:
           export HOST_TEST=${{secrets.DB_HOST_TEST}}
           export DB_PORT_TEST=${{secrets.DB_PORT_TEST}}
           export DB_NAME_TEST=${{secrets.DB_NAME_TEST}}
+          export TEST_USER_EMAIL=${{secrets.TEST_USER_EMAIL}}
+          export TEST_USER_PASSWORD=${{secrets.TEST_USER_PASSWORD}}
+          export TEST_URL=${{secrets.TEST_URL}}
           pip install -r requirements.txt
           pip install pytest
-          pytest
+          pip install pytest-cov
+          pytest --cov=. test/
 
   build:
     needs: test
