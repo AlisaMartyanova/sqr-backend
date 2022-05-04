@@ -33,19 +33,19 @@ class Test:
         response = app.test_client().patch('/assignee', headers={'token': 'token'})
         assert json.loads(response.data.decode('utf-8')) == {'message': 'Invalid Firebase ID Token'}
 
-        response = app.test_client().patch('/assignee', headers={'token': self.token})
-        assert json.loads(response.data.decode('utf-8')) == {'message': {'event_id': 'This field cannot be blank'}}
+#         response = app.test_client().patch('/assignee', headers={'token': self.token})
+#         assert json.loads(response.data.decode('utf-8')) == {'message': {'event_id': 'This field cannot be blank'}}
 
-        response = app.test_client().patch('/assignee', headers={'token': self.token},
-                                           json={'event_id': self.event_info['wrong_event_id']})
-        assert json.loads(response.data.decode('utf-8')) == {'message': 'No events found'}
+#         response = app.test_client().patch('/assignee', headers={'token': self.token},
+#                                            json={'event_id': self.event_info['wrong_event_id']})
+#         assert json.loads(response.data.decode('utf-8')) == {'message': 'No events found'}
 
-        response = app.test_client().post('/events', headers={'token': self.token},
-                                          json={'name': self.event_info['event_name'],
-                                                'gift_date': '2022-02-25',
-                                                'location': self.event_info['place'], 'members': self.data['email']})
-        id = json.loads(response.data.decode('utf-8'))['id']
-        response = app.test_client().patch('/assignee', headers={'token': self.token}, json={'event_id': id})
-        assert json.loads(response.data.decode('utf-8')) == {'message': 'Not enough participants'}
+#         response = app.test_client().post('/events', headers={'token': self.token},
+#                                           json={'name': self.event_info['event_name'],
+#                                                 'gift_date': '2022-02-25',
+#                                                 'location': self.event_info['place'], 'members': self.data['email']})
+#         id = json.loads(response.data.decode('utf-8'))['id']
+#         response = app.test_client().patch('/assignee', headers={'token': self.token}, json={'event_id': id})
+#         assert json.loads(response.data.decode('utf-8')) == {'message': 'Not enough participants'}
 
         conftest.pytest_unconfigure()
