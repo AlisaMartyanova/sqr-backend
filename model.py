@@ -33,7 +33,7 @@ class User(db.Model):
         return users
 
     @classmethod
-    def get_or_create(cls, email) -> 'User':
+    def get_or_create(cls, email):
         user: Optional[User] = cls.query.filter_by(email=email).first()
         if user is None:
             user = User(email=email)
@@ -59,8 +59,8 @@ class Event(db.Model):
     members_assigned = db.Column(db.Boolean)
 
     @classmethod
-    # def create_with_memberships(cls, creator_id, name, gift_date, location: datetime.datetime, members: List[User]) -> 'Event':
-    def create_with_memberships(cls, creator_id, name, gift_date, location, members):
+    def create_with_memberships(cls, creator_id, name, gift_date, location: datetime.datetime, members: List[User]):
+    # def create_with_memberships(cls, creator_id, name, gift_date, location, members):
         new_event = Event(
             members=len(members),
             creator=creator_id,

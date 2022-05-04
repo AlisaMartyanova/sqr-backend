@@ -5,4 +5,5 @@ __pycache__/
 serviceAccountKey.json
 sqlfile.sql
 .coverage
+.mutmut-cache
 

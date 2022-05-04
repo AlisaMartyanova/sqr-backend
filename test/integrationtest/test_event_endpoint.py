@@ -3,7 +3,7 @@ import json
 from datetime import datetime
 from os import environ
 from app import app
-from test.unittest import conftest
+from test import conftest
 
 
 class Test:

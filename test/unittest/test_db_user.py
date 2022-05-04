@@ -1,5 +1,5 @@
 import model
-from test.unittest import conftest
+from test import conftest
 
 
 class Test:

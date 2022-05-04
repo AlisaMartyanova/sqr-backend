@@ -21,15 +21,15 @@ event_parser.add_argument('location', help='This field cannot be blank', require
 event_parser.add_argument('members', help='This field cannot be blank', required=True, action='append', location='json')
 
 invitation_parser = reqparse.RequestParser()
-invitation_parser.add_argument('status', help='This field cannot be blank', required=True, location='args')
-invitation_parser.add_argument('event_id', help='This field cannot be blank', required=True, location='args')
+invitation_parser.add_argument('status', help='This field cannot be blank', required=True, location='json')
+invitation_parser.add_argument('event_id', help='This field cannot be blank', required=True, location='json')
 
 wishlist_parser = reqparse.RequestParser()
-wishlist_parser.add_argument('event_id', help='This field cannot be blank', required=True, location='args')
-wishlist_parser.add_argument('wishlist', help='This field cannot be blank', required=True, location='args')
+wishlist_parser.add_argument('event_id', help='This field cannot be blank', required=True, location='json')
+wishlist_parser.add_argument('wishlist', help='This field cannot be blank', required=True, location='json')
 
 assignee_parser = reqparse.RequestParser()
-assignee_parser.add_argument('event_id', help='This field cannot be blank', required=True, location='args')
+assignee_parser.add_argument('event_id', help='This field cannot be blank', required=True, location='json')
 
 
 def authenticate_user(token: str):
@@ -179,10 +179,10 @@ class AssignGiftees(Resource):
 
     def patch(self):
         token = token_parser.parse_args()['token']
+        user = authenticate_user(token)
+
         event = assignee_parser.parse_args()
         event_id = event['event_id']
-
-        user = authenticate_user(token)
 
         try:
             event = model.Event.find_by_id(event_id)
