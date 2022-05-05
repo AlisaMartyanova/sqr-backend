@@ -114,6 +114,7 @@ class Membership(db.Model):
 
     @classmethod
     def update_status(cls, user_id, event_id, status):
+
         event = cls.query.filter_by(user_id=user_id, event_id=event_id).first()
         event.status = status
         db.session.commit()
@@ -123,7 +124,7 @@ class Membership(db.Model):
     def update_assignee(cls, user_id, event_id, assignee):
         event = cls.query.filter_by(user_id=user_id, event_id=event_id).first()
         event.asignee = assignee
-        # db.session.commit()
+        db.session.commit()
         # return {'message': 'Event assignee was successfully edited'}
 
     @classmethod
@@ -136,3 +137,5 @@ class Membership(db.Model):
     @classmethod
     def get_accepted_event(cls, event_id):
         return cls.query.filter_by(event_id=event_id, status='accepted').all()
+
+

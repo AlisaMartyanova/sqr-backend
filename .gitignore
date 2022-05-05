@@ -2,8 +2,8 @@
 venv/
 __pycache__/
 .pytest_cache/
-serviceAccountKey.json
 sqlfile.sql
 .coverage
 .mutmut-cache
+env/
 
