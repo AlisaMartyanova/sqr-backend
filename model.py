@@ -29,7 +29,7 @@ class User(db.Model):
                 users.append(user)
         if len(failed_users) > 0:
             failed_users_str = "Cannot find users with emails: " + (", ".join(failed_users))
-            raise abort(400, message=failed_users_str)
+            raise abort(400, message={'members': failed_users_str})
         return users
 
     @classmethod
@@ -71,6 +71,8 @@ class Event(db.Model):
         )
         db.session.add(new_event)
         db.session.commit()  # fetch ID
+
+        db.session.add(Membership(user_id=creator_id, event_id=new_event.id, status="creator"))
         for member in members:
             new_event_mem = Membership(
                 user_id=member.id,

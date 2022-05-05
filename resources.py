@@ -1,9 +1,11 @@
+import re
 from datetime import datetime
 
 import firebase_admin
 import sqlalchemy
 from firebase_admin import auth, credentials
 from flask_restful import Resource, reqparse, abort
+from werkzeug.routing import ValidationError
 
 import model
 from app import db
@@ -14,11 +16,35 @@ firebase_admin.initialize_app(cred)
 token_parser = reqparse.RequestParser()
 token_parser.add_argument('token', help='This field cannot be blank', required=True, location='headers')
 
+
+def constr(minimum, maximim):
+    def validate(s):
+        if len(s) == 0:
+            raise ValidationError("Field cannot be blank")
+        if len(s) > maximim:
+            raise ValidationError("Field must be less than %d characters long" % maximim)
+        if len(s) >= minimum:
+            return s
+        raise ValidationError("Field must be at least %d characters long" % minimum)
+    return validate
+
+
+EMAIL_REGEX = re.compile(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$")
+
+
+def email(s):
+    if len(s) == 0:
+        raise ValidationError("Empty email present in list")
+    if not EMAIL_REGEX.match(s):
+        raise ValidationError("Invalid email: %s" % s)
+    return s
+
+
 event_parser = reqparse.RequestParser()
-event_parser.add_argument('name', help='This field cannot be blank', required=True, location='json')
-event_parser.add_argument('gift_date', help='This field cannot be blank', required=True, location='json')
-event_parser.add_argument('location', help='This field cannot be blank', required=True, location='json')
-event_parser.add_argument('members', help='This field cannot be blank', required=True, action='append', location='json')
+event_parser.add_argument('name',  type=constr(3, 20), nullable=False, required=True, location='json')
+event_parser.add_argument('gift_date', type=constr(3, 20), nullable=False, required=True, location='json')
+event_parser.add_argument('location', type=constr(3, 20), nullable=False, required=True, location='json')
+event_parser.add_argument('members', type=email, nullable=False, required=True, action='append', location='json')
 
 invitation_parser = reqparse.RequestParser()
 invitation_parser.add_argument('status', help='This field cannot be blank', required=True, location='json')
@@ -66,11 +92,17 @@ class Event(Resource):
         event_location = event['location']
         event_members = set(event['members'])
 
+        if user.email in event_members:
+            message = "You cannot invite yourself (%s)" % user.email
+            raise abort(400, message={'members': message})
+
         if len(event_members) < 1:
-            raise abort(400, message="At least 1 member of event is required")
+            message = "At least 1 member of event is required"
+            raise abort(400, message={'members': message})
 
         if len(event_members) > 10:
-            raise abort(400, message="Maximum 10 members allowed")
+            message = "Maximum 10 members allowed"
+            raise abort(400, message={'members': message})
 
         members = model.User.ensure_all_users_exist(event_members)
         new_event = model.Event.create_with_memberships(
@@ -129,13 +161,9 @@ class Invitation(Resource):
     def patch(self):
         token = token_parser.parse_args()['token']
         user = authenticate_user(token)
-
-        try:
-            invitation = invitation_parser.parse_args()
-            invitation_status = invitation['status']
-            event_id = invitation['event_id']
-        except:
-            return {'message': 'Wrong request arguments'}, 400
+        invitation = invitation_parser.parse_args()
+        invitation_status = invitation['status']
+        event_id = invitation['event_id']
 
         if invitation_status not in ['accepted', 'pending', 'denied']:
             return {'message': 'Wrong status: it should be "accepted", "pending" or "denied"'}, 400
