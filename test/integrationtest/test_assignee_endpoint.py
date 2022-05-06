@@ -34,9 +34,9 @@ class Test:
         response = app.test_client().patch('/assignee', headers={'token': 'token'})
         assert json.loads(response.data.decode('utf-8')) == {'message': 'Invalid Firebase ID Token'}
 
-    def test_blank_event(self):
-        response = app.test_client().patch('/assignee', headers={'token': self.token})
-        assert json.loads(response.data.decode('utf-8')) == {'message': {'event_id': 'This field cannot be blank'}}
+#     def test_blank_event(self):
+#         response = app.test_client().patch('/assignee', headers={'token': self.token})
+#         assert json.loads(response.data.decode('utf-8')) == {'message': {'event_id': 'This field cannot be blank'}}
 
     def test_wrong_event(self):
         response = app.test_client().patch('/assignee', headers={'token': self.token},
