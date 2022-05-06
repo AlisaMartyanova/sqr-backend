@@ -41,10 +41,10 @@ def email(s):
 
 
 event_parser = reqparse.RequestParser()
-event_parser.add_argument('name',  type=constr(3, 20), nullable=False, required=True, location='json')
-event_parser.add_argument('gift_date', type=constr(3, 20), nullable=False, required=True, location='json')
-event_parser.add_argument('location', type=constr(3, 20), nullable=False, required=True, location='json')
-event_parser.add_argument('members', type=email, nullable=False, required=True, action='append', location='json')
+event_parser.add_argument('name', help='This field cannot be blank',  type=constr(3, 20), nullable=False, required=True, location='json')
+event_parser.add_argument('gift_date', help='This field cannot be blank', type=constr(3, 20), nullable=False, required=True, location='json')
+event_parser.add_argument('location', help='This field cannot be blank', type=constr(3, 20), nullable=False, required=True, location='json')
+event_parser.add_argument('members', help='This field cannot be blank', type=email, nullable=False, required=True, action='append', location='json')
 
 invitation_parser = reqparse.RequestParser()
 invitation_parser.add_argument('status', help='This field cannot be blank', required=True, location='json')

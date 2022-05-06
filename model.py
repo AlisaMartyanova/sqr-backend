@@ -62,7 +62,7 @@ class Event(db.Model):
     def create_with_memberships(cls, creator_id, name, gift_date, location: datetime.datetime, members: List[User]):
     # def create_with_memberships(cls, creator_id, name, gift_date, location, members):
         new_event = Event(
-            members=len(members),
+            members=len(members)+1,
             creator=creator_id,
             name=name,
             gift_date=gift_date,
@@ -72,7 +72,7 @@ class Event(db.Model):
         db.session.add(new_event)
         db.session.commit()  # fetch ID
 
-        db.session.add(Membership(user_id=creator_id, event_id=new_event.id, status="creator"))
+        db.session.add(Membership(user_id=creator_id, event_id=new_event.id, status="accepted"))
         for member in members:
             new_event_mem = Membership(
                 user_id=member.id,
