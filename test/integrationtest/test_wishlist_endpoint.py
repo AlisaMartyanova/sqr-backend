@@ -8,6 +8,7 @@ import model
 
 
 class Test:
+    path = '/wishlist'
     data = {
         "email": environ.get('TEST_USER_EMAIL'),
         "password": environ.get('TEST_USER_PASSWORD'),
@@ -29,15 +30,15 @@ class Test:
     }
 
     def test_blank_token(self):
-        response = app.test_client().patch('/wishlist')
+        response = app.test_client().patch(self.path)
         assert json.loads(response.data.decode('utf-8')) == {'message': {'token': 'This field cannot be blank'}}
 
     def test_invalid_token(self):
-        response = app.test_client().patch('/wishlist', headers={'token': 'token'})
+        response = app.test_client().patch(self.path, headers={'token': 'token'})
         assert json.loads(response.data.decode('utf-8')) == {'message': 'Invalid Firebase ID Token'}
 
     def test_blank_field(self):
-        response = app.test_client().patch('/wishlist', headers={'token': self.token})
+        response = app.test_client().patch(self.path, headers={'token': self.token})
         assert json.loads(response.data.decode('utf-8')) == {'message': 'Wrong request arguments'}
 
     def test_correct(self):
@@ -46,7 +47,7 @@ class Test:
         event = model.Event.create_with_memberships(model.User.get_or_create(self.data['email']).id,
                                                     self.event_info['event_name'], self.event_info['date'],
                                                     self.event_info['place'], [member])
-        response = app.test_client().patch('/wishlist', headers={'token': self.token},
+        response = app.test_client().patch(self.path, headers={'token': self.token},
                                                json={'wishlist': self.event_info['wishlist'], 'event_id': event.id})
         assert json.loads(response.data.decode('utf-8')) == {'message': 'Event wish list was successfully edited'}
 

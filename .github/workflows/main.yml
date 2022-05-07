@@ -28,6 +28,7 @@ jobs:
           export TEST_USER_EMAIL=${{secrets.TEST_USER_EMAIL}}
           export TEST_USER_PASSWORD=${{secrets.TEST_USER_PASSWORD}}
           export TEST_URL=${{secrets.TEST_URL}}
+          export FLASK_SECRET=${{secrets.FLASK_SECRET}}
           pip install -r requirements.txt
           pip install pytest
           pip install pytest-cov
@@ -59,6 +60,7 @@ jobs:
           heroku config:set HOST=${{secrets.DB_HOST}} -a ${{secrets.HEROKU_APP_NAME}}
           heroku config:set DB_PORT=${{secrets.DB_PORT}} -a ${{secrets.HEROKU_APP_NAME}}
           heroku config:set DB_NAME=${{secrets.DB_NAME}} -a ${{secrets.HEROKU_APP_NAME}}
+          heroku config:set FLASK_SECRET=${{secrets.FLASK_SECRET}} -a ${{secrets.HEROKU_APP_NAME}}
 
       - name: Push to heroku
         uses: akhileshns/heroku-deploy@v3.12.12
