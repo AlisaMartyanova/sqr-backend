@@ -152,6 +152,7 @@ class Event(Resource):
                 'members_assigned': event.members_assigned,
                 'assignee_email': assignee,
                 'assignee_wishlist': assignee_wishlist,
+                'wishlist': membership.wishlist,
                 'status': model.Membership.find_by_user_event(user.id, membership.event_id).status
             })
 
