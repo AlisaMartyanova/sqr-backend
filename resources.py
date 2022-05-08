@@ -31,7 +31,10 @@ def constr(minimum, maximim):
         raise ValidationError("Field must be at least %d characters long"
                              % minimum)
     return validate
+
+
 EMAIL_REGEX = re.compile(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$")
+
 
 def email(s):
     if len(s) == 0:
@@ -42,7 +45,7 @@ def email(s):
 
 
 event_parser = reqparse.RequestParser()
-event_parser.add_argument('name', help=help_mess,  type=constr(3, 20),
+event_parser.add_argument('name', help=help_mess, type=constr(3, 20),
                           nullable=False, required=True, location='json')
 event_parser.add_argument('gift_date', help=help_mess, type=constr(3, 20),
                           nullable=False, required=True, location='json')
@@ -86,6 +89,7 @@ def check_user(user_email):
     if model.User.find_by_email(user_email) is None:
         return False
     return True
+
 
 # noinspection PyMethodMayBeStatic
 class Event(Resource):
@@ -198,7 +202,7 @@ class Wishlist(Resource):
             wishlist = wishlist_parser.parse_args()
             wish = wishlist['wishlist']
             event_id = wishlist['event_id']
-        except:
+        except Exception:
             return {'message': 'Wrong request arguments'}, 400
 
         try:
@@ -268,3 +272,4 @@ class AssignGiftees(Resource):
             return {'message': str(e)}, 500
 
         return {'message': 'Participants assigned'}, 200
+        

@@ -1,14 +1,10 @@
 import datetime
 from typing import Optional, Iterable, List
-
 from flask_restful import abort
-
 from app import db
-
 
 class User(db.Model):
     __tablename__ = 'users'
-
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     email = db.Column(db.String(256), unique=True, nullable=False)
 
@@ -138,5 +134,4 @@ class Membership(db.Model):
     @classmethod
     def get_accepted_event(cls, event_id):
         return cls.query.filter_by(event_id=event_id, status='accepted').all()
-
-
+        
