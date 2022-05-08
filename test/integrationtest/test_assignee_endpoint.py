@@ -66,7 +66,7 @@ class Test:
         conftest.pytest_unconfigure()
         event = model.Event.create_with_memberships(
             model.User.get_or_create(self.data['email']).id,
-            elf.event_info['event_name'], self.event_info['date'],
+            self.event_info['event_name'], self.event_info['date'],
             self.event_info['place'], [])
         response = app.test_client().patch(self.path, 
                 headers={'token': self.token}, json={'event_id': event.id})
