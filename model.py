@@ -56,15 +56,15 @@ class Event(db.Model):
     members = db.Column(db.Integer)
     creator = db.Column(db.Integer, db.ForeignKey(key), nullable=False)
     name = db.Column(db.String(256))
-    gift_date = db.Column(db.DateTime, nullable=True) 
+    gift_date = db.Column(db.DateTime, nullable=True)
     location = db.Column(db.String(256))
     members_assigned = db.Column(db.Boolean)
 
     @classmethod
-    def create_with_memberships(cls, creator_id, name, gift_date, location: 
+    def create_with_memberships(cls, creator_id, name, gift_date, location:
         datetime.datetime, members: List[User]):
         new_event = Event(
-            members=len(members)+1,
+            members=len(members) + 1,
             creator=creator_id,
             name=name,
             gift_date=gift_date,
@@ -73,8 +73,7 @@ class Event(db.Model):
         )
         db.session.add(new_event)
         db.session.commit()  # fetch ID
-
-        db.session.add(Membership(user_id=creator_id, event_id=new_event.id, 
+        db.session.add(Membership(user_id=creator_id, event_id=new_event.id,
                                   status="accepted"))
         for member in members:
             new_event_mem = Membership(
@@ -102,8 +101,9 @@ class Membership(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, db.ForeignKey(key), nullable=False)
-    event_id = db.Column(db.Integer, db.ForeignKey("events.id"), nullable=False)
-    status = db.Column(db.String(30), nullable=False, server_default="pending") 
+    event_id = db.Column(db.Integer, db.ForeignKey("events.id"), 
+                nullable=False)
+    status = db.Column(db.String(30), nullable=False, server_default="pending")
     asignee = db.Column(db.Integer, db.ForeignKey(key))
     wishlist = db.Column(db.Text)
 
@@ -117,7 +117,6 @@ class Membership(db.Model):
 
     @classmethod
     def update_status(cls, user_id, event_id, status):
-
         event = cls.query.filter_by(user_id=user_id, event_id=event_id).first()
         event.status = status
         db.session.commit()

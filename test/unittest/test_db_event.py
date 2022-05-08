@@ -30,9 +30,8 @@ class Test:
         assert event.name == self.event_info['event_name']
         assert event.gift_date == self.event_info['date']
         assert event.location == self.event_info['place']
-
         assert len(model.Membership.query.filter_by().all()) == len(
-            self.event_info['members'])+1
+            self.event_info['members']) + 1
 
     def test_find_by_id(self):
         conftest.pytest_unconfigure()

@@ -14,9 +14,8 @@ help_mess = 'This field cannot be blank'
 
 cred = credentials.Certificate("serviceAccountKey.json")
 firebase_admin.initialize_app(cred)
-
 token_parser = reqparse.RequestParser()
-token_parser.add_argument('token', help=help_mess, required=True, 
+token_parser.add_argument('token', help=help_mess, required=True,
                           location='headers')
 
 
@@ -29,13 +28,10 @@ def constr(minimum, maximim):
                                  % maximim)
         if len(s) >= minimum:
             return s
-        raise ValidationError("Field must be at least %d characters long" 
+        raise ValidationError("Field must be at least %d characters long"
                              % minimum)
     return validate
-
-
 EMAIL_REGEX = re.compile(r"^[A-Za-z0-9\.\+_-]+@[A-Za-z0-9\._-]+\.[a-zA-Z]*$")
-
 
 def email(s):
     if len(s) == 0:
@@ -46,29 +42,30 @@ def email(s):
 
 
 event_parser = reqparse.RequestParser()
-event_parser.add_argument('name', help=help_mess,  type=constr(3, 20), 
+event_parser.add_argument('name', help=help_mess,  type=constr(3, 20),
                           nullable=False, required=True, location='json')
-event_parser.add_argument('gift_date', help=help_mess, type=constr(3, 20), 
+event_parser.add_argument('gift_date', help=help_mess, type=constr(3, 20),
                           nullable=False, required=True, location='json')
-event_parser.add_argument('location', help=help_mess, type=constr(3, 20), 
+event_parser.add_argument('location', help=help_mess, type=constr(3, 20),
                           nullable=False, required=True, location='json')
-event_parser.add_argument('members', help=help_mess, type=email, nullable=False, 
-                          required=True, action='append', location='json')
+event_parser.add_argument('members', help=help_mess, type=email,
+                          nullable=False, required=True, action='append',
+                          location='json')
 
 invitation_parser = reqparse.RequestParser()
-invitation_parser.add_argument('status', help=help_mess, required=True, 
+invitation_parser.add_argument('status', help=help_mess, required=True,
                                location='json')
-invitation_parser.add_argument('event_id', help=help_mess, required=True, 
+invitation_parser.add_argument('event_id', help=help_mess, required=True,
                                 location='json')
 
 wishlist_parser = reqparse.RequestParser()
-wishlist_parser.add_argument('event_id', help=help_mess, required=True, 
+wishlist_parser.add_argument('event_id', help=help_mess, required=True,
                             location='json')
-wishlist_parser.add_argument('wishlist', help=help_mess, required=True, 
+wishlist_parser.add_argument('wishlist', help=help_mess, required=True,
                             location='json')
 
 assignee_parser = reqparse.RequestParser()
-assignee_parser.add_argument('event_id', help=help_mess, required=True, 
+assignee_parser.add_argument('event_id', help=help_mess, required=True,
                             location='json')
 
 
@@ -81,7 +78,6 @@ def authenticate_user(token: str):
         raise abort(401, message="Invalid Firebase ID Token")
     except auth.UserNotFoundError:
         raise abort(401, message="User not found by Firebase UID")
-
     return model.User.get_or_create(firebase_user.email)
 
 
@@ -91,12 +87,10 @@ def check_user(user_email):
         return False
     return True
 
-
 # noinspection PyMethodMayBeStatic
 class Event(Resource):
 
     def post(self):
-
         token = token_parser.parse_args()['token']
         user = authenticate_user(token)
 
@@ -135,14 +129,14 @@ class Event(Resource):
         try:
             memberships = model.Membership.find_by_user(user.id)
         except (sqlalchemy.exc.InterfaceError, AttributeError):
-            return {'message': 
+            return {'message':
                     'Wrong database request, could not find event'}, 500
 
         for membership in memberships:
             try:
                 event = model.Event.find_by_id(membership.event_id)
             except (sqlalchemy.exc.InterfaceError, AttributeError):
-                return {'message': 
+                return {'message':
                         'Wrong database request, could not find event'}, 500
 
             assignee = None
@@ -153,13 +147,13 @@ class Event(Resource):
                     assignee_wishlist = model.Membership.find_by_user_event(
                         membership.asignee, membership.event_id).wishlist
                 except (sqlalchemy.exc.InterfaceError, AttributeError):
-                    return {'message': 
+                    return {'message':
                     'Wrong db request, cannot find assignee or wishlist'}, 500
 
             cur_user_events.append({
                 'event_id': membership.event_id,
                 'invitations': event.members,
-                'accepted_members': 
+                'accepted_members':
                 len(model.Membership.get_accepted_event(membership.event_id)),
                 'creator': model.User.find_by_id(event.creator).email,
                 'name': event.name,
@@ -169,15 +163,13 @@ class Event(Resource):
                 'members_assigned': event.members_assigned,
                 'assignee_email': assignee,
                 'assignee_wishlist': assignee_wishlist,
-                'status': model.Membership.find_by_user_event(user.id, 
+                'status': model.Membership.find_by_user_event(user.id,
                                                     membership.event_id).status
             })
-
         return cur_user_events, 200
 
 
 class Invitation(Resource):
-
     def patch(self):
         token = token_parser.parse_args()['token']
         user = authenticate_user(token)
@@ -186,20 +178,18 @@ class Invitation(Resource):
         event_id = invitation['event_id']
 
         if invitation_status not in ['accepted', 'pending', 'denied']:
-            return {'message': 
-            'Wrong status: it should be "accepted", "pending" or "denied"'}, 400
+            return {'message':
+            'Wrong status: expecting "accepted", "pending" or "denied"'}, 400
 
         try:
-            message = model.Membership.update_status(user.id, event_id, 
+            message = model.Membership.update_status(user.id, event_id,
                       invitation_status)
         except Exception as e:
             return {'message': str(e)}, 500
-
         return message, 200
 
 
 class Wishlist(Resource):
-
     def patch(self):
         token = token_parser.parse_args()['token']
         user = authenticate_user(token)
@@ -215,7 +205,6 @@ class Wishlist(Resource):
             message = model.Membership.update_wishlist(user.id, event_id, wish)
         except Exception as e:
             return {'message': str(e)}, 500
-
         return message, 200
 
 
@@ -226,7 +215,6 @@ def move_left(list):
 
 
 class AssignGiftees(Resource):
-
     def patch(self):
         token = token_parser.parse_args()['token']
         user = authenticate_user(token)
@@ -237,7 +225,7 @@ class AssignGiftees(Resource):
         try:
             event = model.Event.find_by_id(event_id)
         except (sqlalchemy.exc.InterfaceError, AttributeError):
-            return {'message': 
+            return {'message':
                     'Wrong database request, could not find model'}, 500
 
         if event is None:
@@ -249,7 +237,7 @@ class AssignGiftees(Resource):
         try:
             accepted = model.Membership.get_accepted_event(event_id)
         except (sqlalchemy.exc.InterfaceError, AttributeError):
-            return {'message': 
+            return {'message':
                     'Wrong database request, cannot find accepted events'}, 500
 
         if len(accepted) <= 1:
