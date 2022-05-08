@@ -31,25 +31,36 @@ class Test:
 
     def test_blank_token(self):
         response = app.test_client().patch(self.path)
-        assert json.loads(response.data.decode('utf-8')) == {'message': {'token': 'This field cannot be blank'}}
+        assert json.loads(response.data.decode('utf-8')) == {
+            'message': {'token': 'This field cannot be blank'}}
 
     def test_invalid_token(self):
-        response = app.test_client().patch(self.path, headers={'token': 'token'})
-        assert json.loads(response.data.decode('utf-8')) == {'message': 'Invalid Firebase ID Token'}
+        response = app.test_client().patch(self.path, 
+            headers={'token': 'token'})
+        assert json.loads(response.data.decode('utf-8')) == {
+            'message': 'Invalid Firebase ID Token'}
 
     def test_blank_field(self):
-        response = app.test_client().patch(self.path, headers={'token': self.token})
-        assert json.loads(response.data.decode('utf-8')) == {'message': 'Wrong request arguments'}
+        response = app.test_client().patch(self.path, 
+            headers={'token': self.token})
+        assert json.loads(response.data.decode('utf-8')) == {'message': 
+                    'Wrong request arguments'}
 
     def test_correct(self):
         conftest.pytest_unconfigure()
         member = model.User.get_or_create(self.event_info['members'][0])
-        event = model.Event.create_with_memberships(model.User.get_or_create(self.data['email']).id,
-                                                    self.event_info['event_name'], self.event_info['date'],
-                                                    self.event_info['place'], [member])
-        response = app.test_client().patch(self.path, headers={'token': self.token},
-                                               json={'wishlist': self.event_info['wishlist'], 'event_id': event.id})
-        assert json.loads(response.data.decode('utf-8')) == {'message': 'Event wish list was successfully edited'}
+        event = model.Event.create_with_memberships(
+                    model.User.get_or_create(self.data['email']).id,
+                    self.event_info['event_name'], self.event_info['date'],
+                    self.event_info['place'], [member])
+        response = app.test_client().patch(self.path, 
+                        headers={'token': self.token},
+                        json={'wishlist': self.event_info['wishlist'], 
+                        'event_id': event.id})
+        assert json.loads(response.data.decode('utf-8')) == {
+            'message': 'Event wish list was successfully edited'}
 
-        response = app.test_client().get('/events', headers={'token': self.token})
-        assert json.loads(response.data.decode('utf-8'))[0]['current_user_wishlist'] == self.event_info['wishlist']
+        response = app.test_client().get('/events', 
+            headers={'token': self.token})
+        assert json.loads(response.data.decode('utf-8'
+            ))[0]['current_user_wishlist'] == self.event_info['wishlist']

@@ -15,21 +15,23 @@ class Test:
     }
 
     def create_event(self):
-        return model.Event.create_with_memberships(model.User.get_or_create(self.event_info['creator']).id,
-                                                   self.event_info['event_name'], self.event_info['date'],
-                                                   self.event_info['place'], [model.User.get_or_create(u)
-                                                                              for u in self.event_info['members']])
+        return model.Event.create_with_memberships(
+            model.User.get_or_create(self.event_info['creator']).id,
+            self.event_info['event_name'], self.event_info['date'],
+            self.event_info['place'], [model.User.get_or_create(u)
+            for u in self.event_info['members']])
 
     def test_create_with_memberships(self):
         conftest.pytest_unconfigure()
         event = self.create_event()
         assert event.members == len(self.event_info['members'])+1
-        assert event.creator == model.User.get_or_create(self.event_info['creator']).id
+        assert event.creator == model.User.get_or_create(
+            self.event_info['creator']).id
         assert event.name == self.event_info['event_name']
         assert event.gift_date == self.event_info['date']
         assert event.location == self.event_info['place']
-
-        assert len(model.Membership.query.filter_by().all()) == len(self.event_info['members'])+1
+        assert len(model.Membership.query.filter_by().all()) == len(
+            self.event_info['members']) + 1
 
     def test_find_by_id(self):
         conftest.pytest_unconfigure()

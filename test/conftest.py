@@ -10,7 +10,8 @@ def pytest_configure():
     HOST = environ.get('HOST_TEST')
     DB_PORT = environ.get('DB_PORT_TEST')
     DB_NAME = environ.get('DB_NAME_TEST')
-    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://{}:{}@{}:{}/{}'.format(USER, PASSWORD, HOST, DB_PORT, DB_NAME)
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://{}:{}@{}:{}/{}'\
+        .format(USER, PASSWORD, HOST, DB_PORT, DB_NAME)
 
 
 def pytest_unconfigure():

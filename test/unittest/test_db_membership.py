@@ -16,10 +16,11 @@ class Test:
     }
 
     def create_event(self):
-        return model.Event.create_with_memberships(model.User.get_or_create(self.event_info['creator']).id,
-                                                   self.event_info['event_name'], self.event_info['date'],
-                                                   self.event_info['place'], [model.User.get_or_create(u)
-                                                                              for u in self.event_info['members']])
+        return model.Event.create_with_memberships(
+            model.User.get_or_create(self.event_info['creator']).id,
+            self.event_info['event_name'], self.event_info['date'],
+            self.event_info['place'], [model.User.get_or_create(u)
+            for u in self.event_info['members']])
 
     def test_find_by_user(self):
         conftest.pytest_unconfigure()
@@ -41,7 +42,8 @@ class Test:
         conftest.pytest_unconfigure()
         event_id = self.create_event().id
         user_id = model.User.get_or_create(self.event_info['creator']).id
-        model.Membership.update_status(user_id, event_id, self.event_info['status'])
+        model.Membership.update_status(user_id, event_id, 
+                                       self.event_info['status'])
 
         mem = model.Membership.find_by_user_event(user_id, event_id).status
         assert mem == self.event_info['status']
@@ -51,9 +53,11 @@ class Test:
         event = self.create_event()
         assignee = model.User.get_or_create(self.event_info['members'][0]).id
 
-        model.Membership.update_assignee(model.User.get_or_create(self.event_info['creator']).id, event.id, assignee)
-        event_assignee_id = model.Membership.find_by_user_event(model.User.get_or_create(self.event_info['creator']).id,
-                                                                event.id).asignee
+        model.Membership.update_assignee(model.User.get_or_create(
+            self.event_info['creator']).id, event.id, assignee)
+        event_assignee_id = model.Membership.find_by_user_event(
+                model.User.get_or_create(self.event_info['creator']).id,
+                event.id).asignee
         assignee_id = assignee
 
         assert assignee_id == event_assignee_id
@@ -65,7 +69,8 @@ class Test:
         wish = "I want to be a happy princess"
         model.Membership.update_wishlist(user_id, event_id, wish)
 
-        event_wish = model.Membership.find_by_user_event(user_id, event_id).wishlist
+        event_wish = model.Membership.find_by_user_event(user_id, 
+                     event_id).wishlist
         assert event_wish == wish
 
     def test_get_accepted_event(self):
