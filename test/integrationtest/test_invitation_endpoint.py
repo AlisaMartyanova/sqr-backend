@@ -55,7 +55,7 @@ class Test:
                                            'event_id': 1})
         assert json.loads(response.data.decode('utf-8')) == \
                {'message': 
-               'Wrong status: it should be "accepted", "pending" or "denied"'}
+               'Wrong status: expecting "accepted", "pending" or "denied"'}
 
     def test_correct_invitation(self):
         conftest.pytest_unconfigure()
