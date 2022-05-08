@@ -27,7 +27,8 @@ class Test:
             'state': True,
             'wishlist': "This is my wishlist",
             'wrong_event_id': 0,
-            'members': ['1234@sdf.com', 'sdfghj@sdf.com', 'sdfhnjjhghj@kjh.com']
+            'members': ['1234@sdf.com', 'sdfghj@sdf.com', 
+                        'sdfhnjjhghj@kjh.com']
         }
 
     def test_blank_token_post(self):
@@ -36,7 +37,8 @@ class Test:
             'message': {'token': self.mess}}
 
     def test_invalid_token_post(self):
-        response = app.test_client().post(self.path, headers={'token': 'token'})
+        response = app.test_client().post(
+            self.path, headers={'token': 'token'})
         assert json.loads(response.data.decode('utf-8')) == {
             'message': 'Invalid Firebase ID Token'}
 

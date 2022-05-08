@@ -38,8 +38,8 @@ class Test:
     def test_invalid_token(self):
         response = app.test_client().patch(self.path, headers={'token': 
                                                                 'token'})
-        assert json.loads(response.data.decode('utf-8')) == {'message': 
-                                                    'Invalid Firebase ID Token'}
+        assert json.loads(response.data.decode('utf-8')) == {
+            'message': 'Invalid Firebase ID Token'}
 
     def test_blank_field(self):
         response = app.test_client().patch(self.path, headers={'token': 
