@@ -21,7 +21,7 @@ jobs:
       - name: Lint with flake8
         run: |
           pip install flake8
-          flake8 --ignore E402,E128 .
+          flake8 --ignore E402,E128,W291,E127 .
         continue-on-error: true
 
       - name: Test
