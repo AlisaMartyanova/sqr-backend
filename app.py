@@ -35,6 +35,10 @@ api.add_resource(resources.AssignGiftees, '/assignee')
 
 @app.before_first_request
 def create_tables():
+    # create test users with simple authentication
+    model.User.get_or_create(f"alisa-test@santa.com")
+    for i in range(10):
+        model.User.get_or_create(f"test{i}@santa.com")
     db.create_all()
 
 
