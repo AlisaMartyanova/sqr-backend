@@ -6,7 +6,8 @@ from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
 app.config['BUNDLE_ERRORS'] = True
-CORS(app)
+# fix cringe: https://stackoverflow.com/questions/71950802/flask-cors-work-only-for-first-request-whats-the-bug-in-my-code
+# CORS(app)
 
 # configure database postgres
 USER = environ.get('USER')
@@ -31,6 +32,16 @@ api.add_resource(resources.Event, '/events')
 api.add_resource(resources.Invitation, '/invitation')
 api.add_resource(resources.Wishlist, '/wishlist')
 api.add_resource(resources.AssignGiftees, '/assignee')
+
+
+# fix cringe: https://stackoverflow.com/questions/71950802/flask-cors-work-only-for-first-request-whats-the-bug-in-my-code
+@app.after_request
+def add_headers(response):
+    response.headers.add('Access-Control-Allow-Headers', 'Token, content-type')
+    response.headers.add('Access-Control-Allow-Credentials', 'true')
+    response.headers.add('Access-Control-Allow-Methods', 'PUT, GET, POST, DELETE, PATCH, OPTIONS')
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    return response
 
 
 @app.before_first_request
