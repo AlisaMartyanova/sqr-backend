@@ -48,11 +48,12 @@ class User(db.Model):
 
 
 class Event(db.Model):
+    key = "users.id"
     __tablename__ = 'events'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     members = db.Column(db.Integer)
-    creator = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False) 
+    creator = db.Column(db.Integer, db.ForeignKey(key), nullable=False)
     name = db.Column(db.String(256))
     gift_date = db.Column(db.DateTime, nullable=True) 
     location = db.Column(db.String(256))
@@ -60,9 +61,8 @@ class Event(db.Model):
 
     @classmethod
     def create_with_memberships(cls, creator_id, name, gift_date, location: datetime.datetime, members: List[User]):
-    # def create_with_memberships(cls, creator_id, name, gift_date, location, members):
         new_event = Event(
-            members=len(members),
+            members=len(members)+1,
             creator=creator_id,
             name=name,
             gift_date=gift_date,
@@ -72,7 +72,7 @@ class Event(db.Model):
         db.session.add(new_event)
         db.session.commit()  # fetch ID
 
-        db.session.add(Membership(user_id=creator_id, event_id=new_event.id, status="creator"))
+        db.session.add(Membership(user_id=creator_id, event_id=new_event.id, status="accepted"))
         for member in members:
             new_event_mem = Membership(
                 user_id=member.id,
@@ -91,17 +91,17 @@ class Event(db.Model):
     def update_members_assigned(cls, id, state):
         event = cls.query.filter_by(id=id).first()
         event.members_assigned = state
-        # return {'message': 'Event members assigned state was successfully edited'}
 
 
 class Membership(db.Model):
+    key = "users.id"
     __tablename__ = 'event_members'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey(key), nullable=False)
     event_id = db.Column(db.Integer, db.ForeignKey("events.id"), nullable=False)
     status = db.Column(db.String(30), nullable=False, server_default="pending") 
-    asignee = db.Column(db.Integer, db.ForeignKey("users.id")) 
+    asignee = db.Column(db.Integer, db.ForeignKey(key))
     wishlist = db.Column(db.Text)
 
     @classmethod
@@ -125,7 +125,6 @@ class Membership(db.Model):
         event = cls.query.filter_by(user_id=user_id, event_id=event_id).first()
         event.asignee = assignee
         db.session.commit()
-        # return {'message': 'Event assignee was successfully edited'}
 
     @classmethod
     def update_wishlist(cls, user_id, event_id, wish):
