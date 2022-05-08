@@ -28,7 +28,8 @@ class User(db.Model):
             else:
                 users.append(user)
         if len(failed_users) > 0:
-            failed_users_str = "Cannot find users with emails: " + (", ".join(failed_users))
+            failed_users_str = "Cannot find users with emails: " + (
+                               ", ".join(failed_users))
             raise abort(400, message={'members': failed_users_str})
         return users
 
@@ -60,7 +61,8 @@ class Event(db.Model):
     members_assigned = db.Column(db.Boolean)
 
     @classmethod
-    def create_with_memberships(cls, creator_id, name, gift_date, location: datetime.datetime, members: List[User]):
+    def create_with_memberships(cls, creator_id, name, gift_date, location: 
+        datetime.datetime, members: List[User]):
         new_event = Event(
             members=len(members)+1,
             creator=creator_id,
@@ -72,7 +74,8 @@ class Event(db.Model):
         db.session.add(new_event)
         db.session.commit()  # fetch ID
 
-        db.session.add(Membership(user_id=creator_id, event_id=new_event.id, status="accepted"))
+        db.session.add(Membership(user_id=creator_id, event_id=new_event.id, 
+                                  status="accepted"))
         for member in members:
             new_event_mem = Membership(
                 user_id=member.id,
